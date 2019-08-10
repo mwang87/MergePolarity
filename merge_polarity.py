@@ -67,19 +67,11 @@ for positive_node in positive_nodes_map:
     positive_id = positive_node[0]
     positive_mz = float(positive_node[1]["precursor mass"])
     positive_rt = float(positive_node[1]["RTMean"])
-    positive_compound = ""
-    
-    if "Compound_Name" in positive_node[1]:
-        positive_compound = positive_node[1]["Compound_Name"]
     
     for negative_node in negative_nodes_map:
         negative_id = negative_node[0]
         negative_mz = float(negative_node[1]["precursor mass"])
         negative_rt = float(negative_node[1]["RTMean"])
-        negative_compound = ""
-        
-        if "Compound_Name" in negative_node[1]:
-            negative_compound = negative_node[1]["Compound_Name"]
         
         mz_delta = positive_mz - negative_mz
         rt_delta = abs(positive_rt - negative_rt)
@@ -90,17 +82,10 @@ for positive_node in positive_nodes_map:
         mz_delta_error_ppm = mz_delta_error/negative_mz * 1000000
         
         if mz_delta < 1.9 or mz_delta > 2.1 or rt_delta > RT_TOLERANCE or mz_delta_error_ppm > PPM_ERROR_TOLERANCE:
-        #if mz_delta < 1.9 or mz_delta > 2.1 or rt_delta > 30:
             continue
             
         plot_values.append(rt_delta)
-        
         new_edges.append([positive_id, negative_id])
-
-        #print(mz_delta_error, mz_delta_error_ppm, positive_id, negative_id, mz_delta, rt_delta, positive_compound, "++++++" ,negative_compound)
-        
-        #if mz_delta > 0 and mz_delta < 5 and rt_delta < 0.5 and len(positive_compound) > 3 and len(negative_compound) > 3:
-        #    print(positive_id, negative_id, mz_delta, rt_delta, positive_compound, "++++++" ,negative_compound)
         
 #Merging Networks
 merged_network = nx.compose(positive_G, negative_G)
