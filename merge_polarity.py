@@ -7,14 +7,22 @@ parser = argparse.ArgumentParser()
 parser.add_argument("output_folder")
 parser.add_argument("--positive-network-task", dest="positivetask", default=None)
 parser.add_argument("--negative-network-task", dest="negativetask", default=None)
+parser.add_argument("--positive-graphml", dest="positivegraphml", default=None)
+parser.add_argument("--negative-graphml", dest="negativegraphml", default=None)
 
 args = parser.parse_args()
 
-positive_url = "https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=%s&block=main&file=gnps_molecular_network_graphml/" % (args.positivetask)
-positive_graphml = os.path.join(args.output_folder, "positive.graphml")
+if args.positivegraphml != None:
+    positive_graphml = args.positivegraphml
+else:
+    positive_url = "https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=%s&block=main&file=gnps_molecular_network_graphml/" % (args.positivetask)
+    positive_graphml = os.path.join(args.output_folder, "positive.graphml")
 
-negative_url = "https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=%s&block=main&file=gnps_molecular_network_graphml/" % (args.negativetask)
-negative_graphml = os.path.join(args.output_folder, "negative.graphml")
+if args.negativegraphml != None:
+    negative_graphml = args.negativegraphml
+else:
+    negative_url = "https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=%s&block=main&file=gnps_molecular_network_graphml/" % (args.negativetask)
+    negative_graphml = os.path.join(args.output_folder, "negative.graphml")
 
 local_file = open(positive_graphml, "w")
 local_file.write(requests.get(positive_url).text)
