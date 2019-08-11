@@ -4,11 +4,13 @@ import requests
 import os
 
 parser = argparse.ArgumentParser()
-parser.add_argument("output_folder")
 parser.add_argument("--positive-network-task", dest="positivetask", default=None)
 parser.add_argument("--negative-network-task", dest="negativetask", default=None)
 parser.add_argument("--positive-graphml", dest="positivegraphml", default=None)
 parser.add_argument("--negative-graphml", dest="negativegraphml", default=None)
+parser.add_argument("--masscolumn", dest="masscolumn", default="precursor mass")
+parser.add_argument("--rtcolumn", dest="rtcolumn", default="RTMean")
+parser.add_argument("--output-graphml", dest="outputgraphml", default="merged_network.graphml")
 
 args = parser.parse_args()
 
@@ -65,13 +67,13 @@ PPM_ERROR_TOLERANCE = 20
 new_edges = []
 for positive_node in positive_nodes_map:
     positive_id = positive_node[0]
-    positive_mz = float(positive_node[1]["precursor mass"])
-    positive_rt = float(positive_node[1]["RTMean"])
+    positive_mz = float(positive_node[1][args.masscolumn])
+    positive_rt = float(positive_node[1][args.rtcolumn])
     
     for negative_node in negative_nodes_map:
         negative_id = negative_node[0]
-        negative_mz = float(negative_node[1]["precursor mass"])
-        negative_rt = float(negative_node[1]["RTMean"])
+        negative_mz = float(negative_node[1][args.masscolumn])
+        negative_rt = float(negative_node[1][args.rtcolumn])
         
         mz_delta = positive_mz - negative_mz
         rt_delta = abs(positive_rt - negative_rt)
@@ -95,4 +97,4 @@ for new_edge in new_edges:
     merged_network.add_edge(new_edge[0], new_edge[1], EdgeType="IonMode")
 
 #Saving out data
-nx.write_graphml(merged_network, os.path.join(args.output_folder, "merged_network.graphml"))
+nx.write_graphml(merged_network, args.outputgraphml)
