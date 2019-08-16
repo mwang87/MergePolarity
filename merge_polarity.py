@@ -11,6 +11,8 @@ parser.add_argument("--negative-graphml", dest="negativegraphml", default=None)
 parser.add_argument("--masscolumn", dest="masscolumn", default="precursor mass")
 parser.add_argument("--rtcolumn", dest="rtcolumn", default="RTMean")
 parser.add_argument("--output-graphml", dest="outputgraphml", default="merged_network.graphml")
+parser.add_argument("--RT_TOLERANCE", dest="RT_TOLERANCE", default="10")
+parser.add_argument("--PPM_ERROR_TOLERANCE", dest="PPM_ERROR_TOLERANCE", default="20")
 
 args = parser.parse_args()
 
@@ -61,8 +63,8 @@ negative_nodes_map = negative_G.nodes.data()
 
 plot_values = []
 
-RT_TOLERANCE = 10
-PPM_ERROR_TOLERANCE = 20
+RT_TOLERANCE = float(args.RT_TOLERANCE)
+PPM_ERROR_TOLERANCE = float(args.PPM_ERROR_TOLERANCE)
 
 new_edges = []
 for positive_node in positive_nodes_map:
