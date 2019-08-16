@@ -2,6 +2,7 @@ import argparse
 import networkx as nx
 import requests
 import os
+import uuid
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--positive-network-task", dest="positivetask", default=None)
@@ -20,21 +21,19 @@ if args.positivegraphml != None:
     positive_graphml = args.positivegraphml
 else:
     positive_url = "https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=%s&block=main&file=gnps_molecular_network_graphml/" % (args.positivetask)
-    positive_graphml = os.path.join(args.output_folder, "positive.graphml")
+    positive_graphml = str(uuid.uuid4()) + ".graphml"
+    local_file = open(positive_graphml, "w")
+    local_file.write(requests.get(positive_url).text)
+    local_file.close()
 
 if args.negativegraphml != None:
     negative_graphml = args.negativegraphml
 else:
     negative_url = "https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?task=%s&block=main&file=gnps_molecular_network_graphml/" % (args.negativetask)
-    negative_graphml = os.path.join(args.output_folder, "negative.graphml")
-
-local_file = open(positive_graphml, "w")
-local_file.write(requests.get(positive_url).text)
-local_file.close()
-
-local_file = open(negative_graphml, "w")
-local_file.write(requests.get(negative_url).text)
-local_file.close()
+    negative_graphml = str(uuid.uuid4()) + ".graphml"
+    local_file = open(negative_graphml, "w")
+    local_file.write(requests.get(negative_url).text)
+    local_file.close()
 
 #Loading Networks
 positive_G = nx.read_graphml(positive_graphml)
