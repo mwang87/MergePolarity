@@ -70,21 +70,23 @@ def merge(positive_graphml, negative_graphml, outputgraphml, RT_TOLERANCE=10, PP
         node_dict[node[0]] = node[1]
 
     for edge in new_edges:
-        edge_data = edge[2]
         node1 = node_dict[edge[0]]
         node2 = node_dict[edge[1]]
 
         mzdelta = abs(node1["precursor mass"] - node2["precursor mass"])
         rtdelta = abs(node1["RTMean"] - node2["RTMean"])
 
-        smiles1 = node1["Smiles"]
-        smiles2 = node2["Smiles"]
-        
-        if len(smiles1) > 5 and len(smiles2) > 5:
-            similarity_url = "https://gnps-structure.ucsd.edu/structuresimilarity"
-            r = requests.get(similarity_url, data={"smiles1": smiles1, "smiles2": smiles2})
-            tanimoto = float(r.text)
-        else:
+        try:
+            smiles1 = node1["Smiles"]
+            smiles2 = node2["Smiles"]
+            
+            if len(smiles1) > 5 and len(smiles2) > 5:
+                similarity_url = "https://gnps-structure.ucsd.edu/structuresimilarity"
+                r = requests.get(similarity_url, data={"smiles1": smiles1, "smiles2": smiles2})
+                tanimoto = float(r.text)
+            else:
+                tanimoto = -1
+        except:
             tanimoto = -1
 
         merged_network.add_edge(edge[0], edge[1], EdgeType="IonMode", mass_difference=mzdelta, rtdelta=rtdelta, tanimoto=tanimoto)
@@ -113,7 +115,7 @@ def merge(positive_graphml, negative_graphml, outputgraphml, RT_TOLERANCE=10, PP
                 output_dict["rt1"] = node1["RTMean"]
                 output_dict["rt2"] = node2["RTMean"]
                 output_dict["rtdelta"] = edge_data["rtdelta"]
-                
+
                 summary_list.append(output_dict)
             except KeyboardInterrupt:
                 raise
