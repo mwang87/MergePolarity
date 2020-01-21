@@ -65,18 +65,33 @@ def merge(positive_graphml, negative_graphml, outputgraphml, RT_TOLERANCE=10, PP
     merged_network = nx.compose(positive_G, negative_G)
 
     #Adding new edges
-    for new_edge in new_edges:
-        merged_network.add_edge(new_edge[0], new_edge[1], EdgeType="IonMode")
-
-    #Saving out data
-    nx.write_graphml(merged_network, outputgraphml)
-
-
-    #Evaluating the Network Merge
-    all_edges = merged_network.edges(data=True)
     node_dict = {}
     for node in list(merged_network.nodes(data=True)):
         node_dict[node[0]] = node[1]
+
+    for edge in new_edges:
+        edge_data = edge[2]
+        node1 = node_dict[edge[0]]
+        node2 = node_dict[edge[1]]
+
+        mzdelta = abs(node1["precursor mass"] - node2["precursor mass"])
+        rtdelta = abs(node1["RTMean"] - node2["RTMean"])
+
+        smiles1 = node1["Smiles"]
+        smiles2 = node2["Smiles"]
+        
+        if len(smiles1) > 5 and len(smiles2) > 5:
+            similarity_url = "https://gnps-structure.ucsd.edu/structuresimilarity"
+            r = requests.get(similarity_url, data={"smiles1": smiles1, "smiles2": smiles2})
+            tanimoto = float(r.text)
+        else:
+            tanimoto = -1
+
+        merged_network.add_edge(edge[0], edge[1], EdgeType="IonMode", mass_difference=mzdelta, rtdelta=rtdelta, tanimoto=tanimoto)
+
+    #Evaluating the Network Merge
+    all_edges = merged_network.edges(data=True)
+    
 
     summary_list = []
     for edge in all_edges:
@@ -86,34 +101,27 @@ def merge(positive_graphml, negative_graphml, outputgraphml, RT_TOLERANCE=10, PP
         
         if edge_data["EdgeType"] == "IonMode":
             try:
-                smiles1 = node1["Smiles"]
-                smiles2 = node2["Smiles"]
-                
-                if len(smiles1) < 5 or len(smiles2) < 5:
-                    continue
-
-                similarity_url = "https://gnps-structure.ucsd.edu/structuresimilarity"
-                r = requests.get(similarity_url, data={"smiles1": smiles1, "smiles2": smiles2})
-                
                 output_dict = {}
+                output_dict["scan1"] = edge[0]
+                output_dict["scan2"] = edge[1]
                 output_dict["smiles1"] = smiles1
                 output_dict["smiles2"] = smiles2
                 output_dict["mz1"] = node1["precursor mass"]
                 output_dict["mz2"] = node2["precursor mass"]
-                output_dict["mzdelta"] = abs(node1["precursor mass"] - node2["precursor mass"])
-                output_dict["tanimoto"] = float(r.text)
+                output_dict["mzdelta"] = edge_data["mass_difference"]
+                output_dict["tanimoto"] = edge_data["tanimoto"]
                 output_dict["rt1"] = node1["RTMean"]
                 output_dict["rt2"] = node2["RTMean"]
-                output_dict["rtdelta"] = abs(node1["RTMean"] - node2["RTMean"])
-
-                edge_data["polaritymerge-rtdelta"] = output_dict["rtdelta"]
-                edge_data["polaritymerge-tanimoto"] = output_dict["tanimoto"]
+                output_dict["rtdelta"] = edge_data["rtdelta"]
                 
                 summary_list.append(output_dict)
             except KeyboardInterrupt:
                 raise
             except:
                 continue
+
+    #Saving out data
+    nx.write_graphml(merged_network, outputgraphml)
 
     if output_summary_table is not None:
         pd.DataFrame(summary_list).to_csv(output_summary_table, sep="\t", index=False)
