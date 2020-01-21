@@ -105,6 +105,9 @@ def merge(positive_graphml, negative_graphml, outputgraphml, RT_TOLERANCE=10, PP
                 output_dict["rt1"] = node1["RTMean"]
                 output_dict["rt2"] = node2["RTMean"]
                 output_dict["rtdelta"] = abs(node1["RTMean"] - node2["RTMean"])
+
+                edge_data["polaritymerge-rtdelta"] = output_dict["rtdelta"]
+                edge_data["polaritymerge-tanimoto"] = output_dict["tanimoto"]
                 
                 summary_list.append(output_dict)
             except KeyboardInterrupt:
