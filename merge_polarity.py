@@ -85,11 +85,12 @@ def merge(positive_graphml, negative_graphml, outputgraphml, RT_TOLERANCE=10, PP
                 r = requests.get(similarity_url, data={"smiles1": smiles1, "smiles2": smiles2})
                 tanimoto = float(r.text)
             else:
-                tanimoto = -1
+                tanimoto = -1.0
         except:
-            tanimoto = -1
+            tanimoto = -1.0
 
-        merged_network.add_edge(edge[0], edge[1], EdgeType="IonMode", mass_difference=mzdelta, rtdelta=rtdelta, tanimoto=tanimoto)
+        print(edge[0], edge[1], tanimoto)
+        merged_network.add_edge(edge[0], edge[1], EdgeType="IonMode", mass_difference="{p:8.3f}".format(p=mzdelta), rtdelta=rtdelta, tanimoto=tanimoto)
 
     #Evaluating the Network Merge
     all_edges = merged_network.edges(data=True)
