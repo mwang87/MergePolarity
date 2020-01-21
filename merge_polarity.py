@@ -92,7 +92,6 @@ def merge(positive_graphml, negative_graphml, outputgraphml, RT_TOLERANCE=10, PP
                 if len(smiles1) < 5 or len(smiles2) < 5:
                     continue
 
-                print(smiles1, smiles2)
                 similarity_url = "https://gnps-structure.ucsd.edu/structuresimilarity"
                 r = requests.get(similarity_url, data={"smiles1": smiles1, "smiles2": smiles2})
                 
@@ -136,6 +135,8 @@ def main():
     parser.add_argument("--masscolumn", dest="masscolumn", default="precursor mass")
     parser.add_argument("--rtcolumn", dest="rtcolumn", default="RTMean")
     parser.add_argument("--output-graphml", dest="outputgraphml", default="merged_network.graphml")
+    parser.add_argument("--output-summary-table", dest="outputsummarytable", default=None)
+    parser.add_argument("--output-summary", dest="outputsummary", default=None)
     parser.add_argument("--RT_TOLERANCE", dest="RT_TOLERANCE", default="10")
     parser.add_argument("--PPM_ERROR_TOLERANCE", dest="PPM_ERROR_TOLERANCE", default="20")
 
@@ -165,7 +166,11 @@ def main():
         print("No input tasks")
         exit(1)
 
-    merge(positive_graphml, negative_graphml, args.outputgraphml, RT_TOLERANCE=args.RT_TOLERANCE, PPM_ERROR_TOLERANCE=args.PPM_ERROR_TOLERANCE, masscolumn=args.masscolumn, rtcolumn=args.rtcolumn)
+    merge(positive_graphml, \
+        negative_graphml, \
+        args.outputgraphml, RT_TOLERANCE=args.RT_TOLERANCE, \
+        PPM_ERROR_TOLERANCE=args.PPM_ERROR_TOLERANCE, masscolumn=args.masscolumn, \
+        rtcolumn=args.rtcolumn, output_summary_table=args.outputsummarytable, output_summary=args.outputsummary)
 
 
 
