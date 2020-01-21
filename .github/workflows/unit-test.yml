@@ -23,6 +23,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install networkx
         pip install requests
+        pip install pandas
     - name: Test with nose2
       run: |
         pip install nose2
