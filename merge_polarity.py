@@ -137,8 +137,8 @@ def merge(positive_graphml, negative_graphml, outputgraphml, RT_TOLERANCE=10, PP
 
     if output_summary is not None:
         with open(output_summary, "w") as output_summary_file:
-            output_summary_file.write(f"total_concordant_pairs {total_concordant_pairs}\n")
-            output_summary_file.write(f"total_pairs {total_pairs}\n")
+            output_summary_file.write("total_concordant_pairs {}\n".format(total_concordant_pairs))
+            output_summary_file.write("total_pairs {}\n".format(total_pairs))
 
 def main():
     parser = argparse.ArgumentParser()
