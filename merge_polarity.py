@@ -7,8 +7,8 @@ import pandas as pd
 
 def merge(positive_graphml, negative_graphml, outputgraphml, RT_TOLERANCE=10, PPM_ERROR_TOLERANCE=20, masscolumn="precursor mass", rtcolumn="RTMean", output_summary_table=None, output_summary=None):
     #Loading Networks
-    positive_G = nx.read_graphml(positive_graphml)
-    negative_G = nx.read_graphml(negative_graphml)
+    positive_G = nx.MultiGraph(nx.read_graphml(positive_graphml))
+    negative_G = nx.MultiGraph(nx.read_graphml(negative_graphml))
 
     #Renaming
     positive_nodes_map = positive_G.nodes.data()
